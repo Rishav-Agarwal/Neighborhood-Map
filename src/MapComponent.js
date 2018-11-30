@@ -1,6 +1,18 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
 class MapComponent extends Component {
+
+	map;
+	markers = [];
+	bounds;
+
+	static propTypes = {
+		locations: PropTypes.array.isRequired
+	};
+
+	state = {
+	};
 
 	/*
 	 *	Load google maps using ReactJS.
@@ -23,7 +35,7 @@ class MapComponent extends Component {
 				const script = document.createElement("script");
 				//Set yout Google Maps API key here
 				const API = YOUR_GOOGLE_MAPS_API_KEY;
-				script.src = `https://maps.googleapis.com/maps/api/js?key=${API}&callback=resolveGoogleMapsPromise`;
+				script.src = `https://maps.googleapis.com/maps/api/js?key=${API}&v=3&callback=resolveGoogleMapsPromise`;
 				script.async = true;
 				script.defer = true;
 				//Append the script to the HTML
@@ -43,15 +55,21 @@ class MapComponent extends Component {
 	componentDidMount() {
 		// Once the Google Maps API has finished loading, initialize the map
 		this.getGoogleMaps().then((google) => {
-			const home = { lat: 22.6205334, lng: 88.3531756 };
-			const map = new google.maps.Map(document.getElementById('map'), {
-				zoom: 15,
-				center: home
+			this.map = !this.map ? new google.maps.Map(document.getElementById('map'), {
+				zoom: 5
+			}) : this.map;
+			this.bounds = new google.maps.LatLngBounds();
+			const currLocations = this.props.locations;
+			this.markers = currLocations.forEach((element, i) => {
+				let marker = new google.maps.Marker({
+					position: element,
+					map: this.map,
+					id: i
+				});
+				this.markers.push(marker);
+				this.bounds.extend(marker.position);
 			});
-			const marker = new google.maps.Marker({
-				position: home,
-				map: map
-			});
+			this.map.fitBounds(this.bounds);
 		});
 	}
 
