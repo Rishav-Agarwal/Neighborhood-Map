@@ -12,6 +12,7 @@ class MapComponent extends Component {
 	};
 
 	state = {
+		//query
 	};
 
 	/*
@@ -50,6 +51,23 @@ class MapComponent extends Component {
 	componentWillMount() {
 		// Start Google Maps API loading since we know we'll soon need it
 		this.getGoogleMaps();
+		const currLocations = this.props.locations;
+		currLocations.forEach((location, i) => {
+			fetch('https://api.foursquare.com/v2/venues/search' +
+				'?client_id=1JOTEIGYTGZQA3RUM0RLT4ZHZZGPABNN3P34M3J3K3VKOD0V' +
+				'&client_secret=VNK0ZO2ZE1LEAUAOMYDXSF4254QDZJQ4H3H123ZJXAPTPYJ1' +
+				'&v=20181201' +
+				`&ll=${location.ll.lat},${location.ll.lng}` +
+				`&query=${location.name}` +
+				'&limit=5')
+				.then(res => res.json())
+				.then(data => {
+					let venue = data.response.venues[0],
+						venueName = location.name,
+						venueAddress = venue.location.formattedAddress.join();
+					this.markers[i].infoWindow.setContent(venueName + '<br/>' + venueAddress);
+				});
+		});
 	}
 
 	componentDidMount() {
@@ -60,14 +78,22 @@ class MapComponent extends Component {
 			}) : this.map;
 			this.bounds = new google.maps.LatLngBounds();
 			const currLocations = this.props.locations;
-			this.markers = currLocations.forEach((element, i) => {
-				let marker = new google.maps.Marker({
-					position: element,
+			currLocations.forEach((location, i) => {
+				let marker = {};
+				marker.marker = new google.maps.Marker({
+					position: location.ll,
 					map: this.map,
-					id: i
+					id: i,
+					title: location.name
+				});
+				marker.infoWindow = new google.maps.InfoWindow({
+					content: this.props.locations[i].name
+				});
+				marker.marker.addListener('click', () => {
+					marker.infoWindow.open(this.map, marker.marker);
 				});
 				this.markers.push(marker);
-				this.bounds.extend(marker.position);
+				this.bounds.extend(marker.marker.position);
 			});
 			this.map.fitBounds(this.bounds);
 		});
