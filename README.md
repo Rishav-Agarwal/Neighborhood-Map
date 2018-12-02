@@ -1,3 +1,29 @@
+# Neighborhood Map
+------------------------------------------------------------------
+
+This project was made as a part of Google-Udacity Front End Web Developer Scholarship program.
+
+It shows you your neighborhood map with pre-defined marked places.
+
+## Features
+
+1. List and search places.
+2. Additional details of a place(using third-party API) when its marker is clicked.
+3. Accessible.
+4. Offline-first app(available *only* on **production** environment).
+
+## How to run?
+
+1. `Fork` and `clone` this repo.
+2. Move to the project directory.
+3. Run `npm install` to install the dependencies.
+4. Run `npm start` to run the app in development mode locally.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to view it.
+6. Finally, run `npm run build` to build app for production.
+
+********************************************************************************************
+
+This app uses [Foursquare](https://foursquare.com/)'s API to fetch data about different locations.<br />
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
