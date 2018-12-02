@@ -50,8 +50,10 @@ class MapComponent extends Component {
       //Location should not be shown
       else
         this.markers[i].marker.setMap(null);
+      console.log(this.props.marked, location.name);
       //Location was clicked on locations list
       if (this.props.marked && location.name === this.props.marked) {
+        console.log(true);
         this.markers[i].marker.setAnimation(window.google.maps.Animation.BOUNCE);
         setTimeout(() => this.markers[i].marker.setAnimation(null), 1000);
         new window.google.maps.event.trigger(this.markers[i].marker, 'click');
@@ -184,6 +186,9 @@ class MapComponent extends Component {
             location.address = venueAddress;
 
             this.props.onUpdateLocation(location, i);
+          }).catch(err => {
+            console.log(err);
+            this.refs.failed.classList.remove('hide');
           });
         this.bounds.extend(marker.marker.position);
       });
@@ -209,6 +214,23 @@ class MapComponent extends Component {
 
         {/* The map */}
         <div id='map' ref='map' />
+
+        {/* Div to show if data could not be loaded */}
+        <div className='failed hide' ref='failed'>
+          <span>Failed to load details about the locations! :(</span>
+          <span
+            className='failed-cross'
+            onClick={e => e.target.parentNode.classList.add('hide')}
+            style={{
+              cursor: 'pointer',
+              margin: '4px',
+              padding: '4px',
+              fontSize: '12px',
+              float: 'right'
+            }}>
+            &#10006;
+            </span>
+        </div>
       </div>
     );
   }

@@ -17,6 +17,28 @@ body,
   display: flex;
 }
 
+/* Failed to load element */
+.failed {
+  border-bottom-right-radius: 12px;
+  border-top-right-radius: 12px;
+  background-color: #eeeeeeee;
+  padding: 8px;
+  position: absolute;
+  bottom: 50%;
+  text-align: center;
+  visibility: visible;
+  transition: all 0.5s;
+  width: 75%;
+  border: 1px dotted grey;
+}
+
+.failed.hide {
+  opacity: 0;
+  overflow: auto;
+  visibility: hidden;
+  transform: translateX(-100px);
+}
+
 /**
  *  Locations menu
  */
@@ -89,6 +111,7 @@ body,
   z-index: 2147483640000000007;
 }
 
+/* Marker's info window */
 .info-window:focus {
   border: 1px dotted grey;
 }
