@@ -53,20 +53,29 @@ class Locations extends Component {
       //The locations list
       <div id='locations' ref='locations'>
         {/* Heading */}
-        <h1>Locations</h1>
+        <h1 tabIndex='0' id='locations-header'>Locations</h1>
         <hr />
         {/* The query input */}
         <input
           className='location-input'
+          aria-label='Search location'
           type='text'
           value={this.state.query}
           placeholder='Enter location to search'
           onChange={e => this.onChangeQuery(e.target.value)} />
         {/* The list of locations */}
-        <ul className='location-list'> {
+        <ul className='location-list' aria-labelledby='locations-header'> {
           // Loop over the locations and create a div for it
           currLocations.map(location => (
-            <div key={location.name} onClick={() => this.props.onClickLocation(location.name)}>
+            <div
+              key={location.name}
+              tabIndex='0'
+              role='listitem'
+              onKeyUp={e => {
+                if (e.keyCode === 13 || e.keyCode === 32)
+                  e.target.click();
+              }}
+              onClick={() => this.props.onClickLocation(location.name)}>
               <li>
                 {location.name}
               </li>

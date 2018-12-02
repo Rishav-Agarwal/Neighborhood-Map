@@ -88,3 +88,7 @@ body,
   left: 0;
   z-index: 2147483640000000007;
 }
+
+.info-window:focus {
+  border: 1px dotted grey;
+}

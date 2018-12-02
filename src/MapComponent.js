@@ -105,6 +105,11 @@ class MapComponent extends Component {
       this.map = !this.map ? new google.maps.Map(document.getElementById('map'), {
         zoom: 12
       }) : this.map;
+      this.map.addListener('tilesloaded', () => {
+        [].slice.apply(this.refs.map.querySelectorAll('*')).forEach(item => {
+          item.setAttribute('tabIndex', '-1');
+        });
+      });
       this.bounds = new google.maps.LatLngBounds();
       /**
        * For each location-
@@ -126,7 +131,7 @@ class MapComponent extends Component {
         });
         //Create info window for the marker
         marker.infoWindow = new google.maps.InfoWindow({
-          content: this.props.locations[i].name
+          content: `<div class='info-window' tabindex='0'>${this.props.locations[i].name}</div>`
         });
         //Attach click and close events of infowindow with marker
         marker.marker.addListener('click', () => {
@@ -175,7 +180,7 @@ class MapComponent extends Component {
                 venueAddress = 'Unknown';
             }*/
             //Update location's info and InfoWindow's content
-            this.markers[i].infoWindow.setContent(venueName + '<br/>' + venueAddress);
+            this.markers[i].infoWindow.setContent(`<div class='info-window' tabindex='0'>${venueName}<br />${venueAddress}</div>`);
             location.address = venueAddress;
 
             this.props.onUpdateLocation(location, i);
@@ -192,13 +197,18 @@ class MapComponent extends Component {
       this.updateMarkers();
     return (
       <div id='map-container'>
-        {/* The map */}
-        <div id='map' />
-
         {/* Locations list toggle icon */}
-        <div className='menu-icon' onClick={this.onClickMenuIcon}>
+        <div tabIndex='0' className='menu-icon'
+          onClick={this.onClickMenuIcon}
+          onKeyUp={e => {
+            if (e.keyCode === 13 || e.keyCode === 32)
+              e.target.click();
+          }}>
           <i ref='menuIcon' className="fas fa-chevron-left"></i>
         </div>
+
+        {/* The map */}
+        <div id='map' ref='map' />
       </div>
     );
   }
