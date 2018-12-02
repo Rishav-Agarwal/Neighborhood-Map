@@ -4,36 +4,53 @@ import escapeRegExp from 'escape-string-regexp';
 
 class MapComponent extends Component {
 
+  //The google maps variable
   map;
+  //Stores the markers and it associated details
   markers = [];
+  //Bounds of the map to be shown
   bounds;
 
   static propTypes = {
+    //Loations' search query
     query: PropTypes.string,
+    //Complete list of locations
     locations: PropTypes.array.isRequired,
+    //Location clicked on the locations' list
     marked: PropTypes.string,
+    //Fired when locations list show/hide icon is clicked
     onClickMenuIcon: PropTypes.func.isRequired,
+    //Fired when a location info is updated
     onUpdateLocation: PropTypes.func.isRequired,
+    //Fired when a markers `InfoWindow`(additional details) is closed
     onCloseInfoWindow: PropTypes.func.isRequired
   };
 
+  //Triggered when locations list show/hide icon is clicked
   onClickMenuIcon = target => {
+    //Toggle the icon's direction
     this.refs.menuIcon.classList.toggle('fa-chevron-right');
     this.refs.menuIcon.classList.toggle('fa-chevron-left');
     this.props.onClickMenuIcon();
   };
 
+  //Updates marker everytime map is rendered
   updateMarkers = () => {
+    /**
+     * Loop over the locations, check if it should be shown on the map and extend bounds according to it.
+     * It a location was clicked, animate it.
+     */
     const match = new RegExp(escapeRegExp(this.props.query ? this.props.query : ''), 'i');
     const currLocations = this.props.locations;
     currLocations.forEach((location, i) => {
       this.markers[i].infoWindow.close();
-      if (match.test(location.name)) {
+      //Location should be shown
+      if (match.test(location.name))
         this.markers[i].marker.setMap(this.map);
-      }
-      else {
+      //Location should not be shown
+      else
         this.markers[i].marker.setMap(null);
-      }
+      //Location was clicked on locations list
       if (this.props.marked && location.name === this.props.marked) {
         this.markers[i].marker.setAnimation(window.google.maps.Animation.BOUNCE);
         setTimeout(() => this.markers[i].marker.setAnimation(null), 1000);
@@ -89,22 +106,35 @@ class MapComponent extends Component {
         zoom: 12
       }) : this.map;
       this.bounds = new google.maps.LatLngBounds();
+      /**
+       * For each location-
+       *  1. Create a marker
+       *  2. Create a InfoWindow.
+       *  3. Attach info-window to marker.
+       *  4. Store the marker and related details in an array.
+       *  5. Fetch its additional details and update the location's info.
+       */
       this.props.locations.forEach((location, i) => {
+        //Markers array
         let marker = {};
+        //Create marker
         marker.marker = new google.maps.Marker({
           position: location.ll,
           map: this.map,
           id: i,
           title: location.name
         });
+        //Create info window for the marker
         marker.infoWindow = new google.maps.InfoWindow({
           content: this.props.locations[i].name
         });
+        //Attach click and close events of infowindow with marker
         marker.marker.addListener('click', () => {
           marker.infoWindow.open(this.map, marker.marker);
         });
         marker.infoWindow.addListener('closeclick', this.props.onCloseInfoWindow);
         this.markers.push(marker);
+        //Fetch additional details for the location
         fetch('https://api.foursquare.com/v2/venues/search' +
           '?client_id=PV25QR443ZLWVJAEWISOXMMWM403GU2AXY0IOLW02HV5CSCA' +
           '&client_secret=HRNFPO004M2V3BJ02AWKNQUQ1FU2E3L5ZQF5HTJV5M5T3030' +
@@ -118,6 +148,10 @@ class MapComponent extends Component {
             let venue = data.response.venues[0],
               venueName = location.name,
               venueAddress = venue.location.formattedAddress.join();
+            /*
+             *  Un-comment the below comment, remove the venue details above and,
+             *  remove the api credentials from the fetch call to test with sample data
+             */
             /*switch (i) {
               case 0:
                 venueAddress = 'Near Agra Fort(Fatehabad Road), Āgra 282001, Uttar Pradesh, India';
@@ -140,6 +174,7 @@ class MapComponent extends Component {
               default:
                 venueAddress = 'Unknown';
             }*/
+            //Update location's info and InfoWindow's content
             this.markers[i].infoWindow.setContent(venueName + '<br/>' + venueAddress);
             location.address = venueAddress;
 
@@ -152,12 +187,15 @@ class MapComponent extends Component {
   }
 
   render() {
+    //If markers have been created, update them
     if (this.markers.length)
       this.updateMarkers();
     return (
       <div id='map-container'>
+        {/* The map */}
         <div id='map' />
 
+        {/* Locations list toggle icon */}
         <div className='menu-icon' onClick={this.onClickMenuIcon}>
           <i ref='menuIcon' className="fas fa-chevron-left"></i>
         </div>

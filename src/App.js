@@ -6,8 +6,11 @@ import Locations from './Locations';
 class App extends Component {
 
   state = {
+    //Location searched for
     query: '',
+    //Should the locations list be shown
     showLocations: true,
+    //The list of locations
     locations: [
       { name: 'Taj Mahal', ll: { lat: 27.1750151, lng: 78.0421552 } },
       { name: 'Qutub Minar', ll: { lat: 28.5244754, lng: 77.1855206 } },
@@ -16,9 +19,14 @@ class App extends Component {
       { name: 'India Gate', ll: { lat: 28.6109401, lng: 77.234482 } },
       { name: 'Gateway of India', ll: { lat: 18.9219841, lng: 72.8346543 } }
     ],
+    //Stores if location was clicked from locations list
     marked: undefined
   };
 
+  /**
+   * This function is triggered if a location's info is updated(currently address).
+   * It updates the location and sets the state of the component.
+   */
   onUpdateLocation = (location, i) => {
     this.setState(prev => {
       prev.locations[i] = location;
@@ -29,21 +37,32 @@ class App extends Component {
   render() {
     return (
       <div id='app'>
-        {this.state.showLocations && (
-          <Locations
-            query={this.state.query}
-            onClickLocation={location => { this.setState({ marked: location }); }}
-            onChangeQuery={query => this.setState({ query })}
-            locations={this.state.locations} />)}
+        { //If locations list should be shown, display it
+          this.state.showLocations && (
+            <Locations
+              //location query
+              query={this.state.query}
+              //It is fired when a location is clicked from locations' list
+              onClickLocation={location => { this.setState({ marked: location }); }}
+              //It is fired when locations' query changes
+              onChangeQuery={query => this.setState({ query })}
+              //The complete list of locations
+              locations={this.state.locations} />)}
 
         <MapComponent
+          //location query
           query={this.state.query}
+          //Location which was clicked from locations' list
           marked={this.state.marked}
+          //The complete list of locations
           locations={this.state.locations}
+          //Fired when locations' list component should open/close
           onClickMenuIcon={() => this.setState(prev => ({
             showLocations: !(prev.showLocations)
           }))}
+          //Fired when a location's info is updated
           onUpdateLocation={this.onUpdateLocation}
+          //Fired when `InfoWindow`(additional info) of a location is closed
           onCloseInfoWindow={() => this.setState({ marked: undefined })} />
       </div>
     );
